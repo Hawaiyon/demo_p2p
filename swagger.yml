@@ -1,0 +1,347 @@
+swagger: "2.0"
+info:
+  description: "This is a P2P trade system."
+  version: "1.0.0"
+  title: "Sample P2P Trade"
+  contact:
+    email: "hawaiyon@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "hawaiyon.ml"
+basePath: "/v1"
+tags:
+- name: "transaction"
+  description: "用户交易相关接口。任何时候，用户的余额都一定是大于等于0，用户不能还款超过其借款。"
+
+- name: "user"
+  description: "用户相关接口"
+
+schemes:
+- "http"
+paths:
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "创建用户"
+      description: "创建用户"
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "json格式，包含用户名和初始金额"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+
+  /user/{userID}:
+    get:
+      tags:
+      - "user"
+      summary: "根据用户id获取具体信息，包括对当前余额、借出总额和借入总额"
+      description: ""
+      operationId: "getUserByID"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userID"
+        in: "path"
+        description: "需要获取信息的用户id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "user found"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+
+  /loan:
+    post:
+      tags:
+      - "transaction"
+      summary: "借款"
+      description: ""
+      operationId: "addLoan"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "借款信息"
+        required: true
+        schema:
+          $ref: "#/definitions/Loan"
+      responses:
+        201:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Loan"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+  /loan/{transactionId}:
+    get:
+      tags:
+      - "transaction"
+      summary: "Find loan by ID"
+      description: "Find loan by ID"
+      operationId: "getLoanById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "transactionId"
+        in: "path"
+        description: "ID of transaction"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Loan"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+
+  /repayment:
+    post:
+      tags:
+      - "transaction"
+      summary: "还款"
+      description: ""
+      operationId: "addRepay"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "还款信息"
+        required: true
+        schema:
+          $ref: "#/definitions/Repayment"
+      responses:
+        201:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Repayment"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+  /repayment/{transactionId}:
+    get:
+      tags:
+      - "transaction"
+      summary: "Find repay by ID"
+      description: "Find repay by ID"
+      operationId: "getRepayById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "transactionId"
+        in: "path"
+        description: "ID of transaction"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Loan"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+
+  /debt:
+    get:
+      tags:
+      - "transaction"
+      summary: "根据基准用户ID，返回跟另外一个用户之间的债务情况"
+      operationId: "getDebtInfo"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "baseUserId"
+        in: "query"
+        type: "integer"
+        format: "int64"
+        required: true
+        description: "基准用户 ID"
+
+      - name: "toUserId"
+        in: "query"
+        type: "integer"
+        format: "int64"
+        required: true
+        description: "另外一个用户的ID"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Debt"
+        default:
+          description: "error"
+          schema:
+            $ref: "#/definitions/api_error"
+
+
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Loan:
+    type: "object"
+    required:
+      - "BorrowerId"
+      - "LenderId"
+      - "amount"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      BorrowerId:
+        type: "integer"
+        format: "int64"
+      LenderId:
+        type: "integer"
+        format: "int64"
+      amount:
+        type: "integer"
+        format: "int64"
+      createdDate:
+        type: "string"
+        format: "date-time"
+        readOnly: true
+      status:
+        type: "string"
+        readOnly: true
+        description: "Transaction Status"
+        enum:
+        - "failed"
+        - "success"
+    xml:
+      name: "Loan"
+  Repayment:
+    type: "object"
+    required:
+      - "BorrowerId"
+      - "LenderId"
+      - "repay_amount"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      BorrowerId:
+        type: "integer"
+        format: "int64"
+      LenderId:
+        type: "integer"
+        format: "int64"
+      repay_amount:
+        type: "integer"
+        format: "int64"
+      createdDate:
+        type: "string"
+        format: "date-time"
+        readOnly: true
+      status:
+        type: "string"
+        readOnly: true
+        description: "Transaction Status"
+        enum:
+        - "failed"
+        - "success"
+    xml:
+      name: "Repayment"
+
+  Debt:
+    type: "object"
+    required:
+      - "baseUserId"
+      - "toUserId"
+      - "borrow"
+      - "lend"
+    properties:
+      baseUserId:
+        type: "integer"
+        format: "int64"
+        description: "基准用户 ID"
+      toUserId:
+        type: "integer"
+        format: "int64"
+        description: "另外一个用户的ID"
+      borrow:
+        type: "integer"
+        format: "int64"
+      lend:
+        type: "integer"
+        format: "int64"
+
+  User:
+    type: "object"
+    required:
+      - "username"
+      - "balance"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      username:
+        type: "string"
+      email:
+        type: "string"
+      balance:
+        type: "integer"
+        format: "int64"
+      total_borrow:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+      total_lend:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+
+    xml:
+      name: "User"
+
+  api_error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
