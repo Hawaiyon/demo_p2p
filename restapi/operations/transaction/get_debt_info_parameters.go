@@ -9,10 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	strfmt "github.com/go-openapi/strfmt"
 )
@@ -35,12 +33,12 @@ type GetDebtInfoParams struct {
 
 	/*基准用户 ID
 	  Required: true
-	  In: query
+	  In: path
 	*/
 	BaseUserID int64
 	/*另外一个用户的ID
 	  Required: true
-	  In: query
+	  In: path
 	*/
 	ToUserID int64
 }
@@ -51,15 +49,13 @@ func (o *GetDebtInfoParams) BindRequest(r *http.Request, route *middleware.Match
 	var res []error
 	o.HTTPRequest = r
 
-	qs := runtime.Values(r.URL.Query())
-
-	qBaseUserID, qhkBaseUserID, _ := qs.GetOK("baseUserId")
-	if err := o.bindBaseUserID(qBaseUserID, qhkBaseUserID, route.Formats); err != nil {
+	rBaseUserID, rhkBaseUserID, _ := route.Params.GetOK("baseUserId")
+	if err := o.bindBaseUserID(rBaseUserID, rhkBaseUserID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
-	qToUserID, qhkToUserID, _ := qs.GetOK("toUserId")
-	if err := o.bindToUserID(qToUserID, qhkToUserID, route.Formats); err != nil {
+	rToUserID, rhkToUserID, _ := route.Params.GetOK("toUserId")
+	if err := o.bindToUserID(rToUserID, rhkToUserID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -70,20 +66,14 @@ func (o *GetDebtInfoParams) BindRequest(r *http.Request, route *middleware.Match
 }
 
 func (o *GetDebtInfoParams) bindBaseUserID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("baseUserId", "query")
-	}
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
-	if err := validate.RequiredString("baseUserId", "query", raw); err != nil {
-		return err
-	}
 
 	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("baseUserId", "query", "int64", raw)
+		return errors.InvalidType("baseUserId", "path", "int64", raw)
 	}
 	o.BaseUserID = value
 
@@ -91,20 +81,14 @@ func (o *GetDebtInfoParams) bindBaseUserID(rawData []string, hasKey bool, format
 }
 
 func (o *GetDebtInfoParams) bindToUserID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("toUserId", "query")
-	}
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
-	if err := validate.RequiredString("toUserId", "query", raw); err != nil {
-		return err
-	}
 
 	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("toUserId", "query", "int64", raw)
+		return errors.InvalidType("toUserId", "path", "int64", raw)
 	}
 	o.ToUserID = value
 

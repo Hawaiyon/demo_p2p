@@ -301,7 +301,7 @@ func (o *P2PAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/debt"] = transaction.NewGetDebtInfo(o.context, o.TransactionGetDebtInfoHandler)
+	o.handlers["GET"]["/debt/{baseUserId}/{toUserId}"] = transaction.NewGetDebtInfo(o.context, o.TransactionGetDebtInfoHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

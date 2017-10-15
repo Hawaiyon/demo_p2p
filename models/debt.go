@@ -24,11 +24,13 @@ type Debt struct {
 
 	// borrow
 	// Required: true
-	Borrow *int64 `json:"borrow"`
+	// Read Only: true
+	Borrow int64 `json:"borrow"`
 
 	// lend
 	// Required: true
-	Lend *int64 `json:"lend"`
+	// Read Only: true
+	Lend int64 `json:"lend"`
 
 	// 另外一个用户的ID
 	// Required: true
@@ -84,7 +86,7 @@ func (m *Debt) validateBaseUserID(formats strfmt.Registry) error {
 
 func (m *Debt) validateBorrow(formats strfmt.Registry) error {
 
-	if err := validate.Required("borrow", "body", m.Borrow); err != nil {
+	if err := validate.Required("borrow", "body", int64(m.Borrow)); err != nil {
 		return err
 	}
 
@@ -93,7 +95,7 @@ func (m *Debt) validateBorrow(formats strfmt.Registry) error {
 
 func (m *Debt) validateLend(formats strfmt.Registry) error {
 
-	if err := validate.Required("lend", "body", m.Lend); err != nil {
+	if err := validate.Required("lend", "body", int64(m.Lend)); err != nil {
 		return err
 	}
 

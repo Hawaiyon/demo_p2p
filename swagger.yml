@@ -8,6 +8,8 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+consumes:
+- "application/json"
 host: "hawaiyon.ml"
 basePath: "/v1"
 tags:
@@ -174,7 +176,7 @@ paths:
           schema:
             $ref: "#/definitions/api_error"
 
-  /debt:
+  /debt/{baseUserId}/{toUserId}:
     get:
       tags:
       - "transaction"
@@ -184,14 +186,14 @@ paths:
       - "application/json"
       parameters:
       - name: "baseUserId"
-        in: "query"
+        in: "path"
         type: "integer"
         format: "int64"
         required: true
         description: "基准用户 ID"
 
       - name: "toUserId"
-        in: "query"
+        in: "path"
         type: "integer"
         format: "int64"
         required: true
@@ -299,9 +301,11 @@ definitions:
       borrow:
         type: "integer"
         format: "int64"
+        readOnly: true
       lend:
         type: "integer"
         format: "int64"
+        readOnly: true
 
   User:
     type: "object"

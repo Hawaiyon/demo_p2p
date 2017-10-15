@@ -27,15 +27,15 @@ type User struct {
 
 	// id
 	// Read Only: true
-	ID int64 `json:"id,omitempty"`
+	Id int64 `json:"id,omitempty"`
 
 	// total borrow
 	// Read Only: true
-	TotalBorrow int64 `json:"total_borrow,omitempty"`
+	TotalBorrow int64 `json:"total_borrow"`
 
 	// total lend
 	// Read Only: true
-	TotalLend int64 `json:"total_lend,omitempty"`
+	TotalLend int64 `json:"total_lend"`
 
 	// username
 	// Required: true

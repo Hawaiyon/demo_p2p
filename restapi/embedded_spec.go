@@ -14,6 +14,9 @@ var SwaggerJSON json.RawMessage
 
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
+  "consumes": [
+    "application/json"
+  ],
   "schemes": [
     "http"
   ],
@@ -33,7 +36,7 @@ func init() {
   "host": "hawaiyon.ml",
   "basePath": "/v1",
   "paths": {
-    "/debt": {
+    "/debt/{baseUserId}/{toUserId}": {
       "get": {
         "produces": [
           "application/json"
@@ -49,7 +52,7 @@ func init() {
             "format": "int64",
             "description": "基准用户 ID",
             "name": "baseUserId",
-            "in": "query",
+            "in": "path",
             "required": true
           },
           {
@@ -57,7 +60,7 @@ func init() {
             "format": "int64",
             "description": "另外一个用户的ID",
             "name": "toUserId",
-            "in": "query",
+            "in": "path",
             "required": true
           }
         ],
@@ -317,11 +320,13 @@ func init() {
         },
         "borrow": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "readOnly": true
         },
         "lend": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "readOnly": true
         },
         "toUserId": {
           "description": "另外一个用户的ID",

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+	"strings"
 
 	"github.com/go-openapi/swag"
 )
@@ -42,27 +43,25 @@ func (o *GetDebtInfoURL) SetBasePath(bp string) {
 func (o *GetDebtInfoURL) Build() (*url.URL, error) {
 	var result url.URL
 
-	var _path = "/debt"
+	var _path = "/debt/{baseUserId}/{toUserId}"
 
+	baseUserID := swag.FormatInt64(o.BaseUserID)
+	if baseUserID != "" {
+		_path = strings.Replace(_path, "{baseUserId}", baseUserID, -1)
+	} else {
+		return nil, errors.New("BaseUserID is required on GetDebtInfoURL")
+	}
+	toUserID := swag.FormatInt64(o.ToUserID)
+	if toUserID != "" {
+		_path = strings.Replace(_path, "{toUserId}", toUserID, -1)
+	} else {
+		return nil, errors.New("ToUserID is required on GetDebtInfoURL")
+	}
 	_basePath := o._basePath
 	if _basePath == "" {
 		_basePath = "/v1"
 	}
 	result.Path = golangswaggerpaths.Join(_basePath, _path)
-
-	qs := make(url.Values)
-
-	baseUserID := swag.FormatInt64(o.BaseUserID)
-	if baseUserID != "" {
-		qs.Set("baseUserId", baseUserID)
-	}
-
-	toUserID := swag.FormatInt64(o.ToUserID)
-	if toUserID != "" {
-		qs.Set("toUserId", toUserID)
-	}
-
-	result.RawQuery = qs.Encode()
 
 	return &result, nil
 }

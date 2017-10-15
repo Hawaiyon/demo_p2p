@@ -29,7 +29,7 @@ func NewGetDebtInfo(ctx *middleware.Context, handler GetDebtInfoHandler) *GetDeb
 	return &GetDebtInfo{Context: ctx, Handler: handler}
 }
 
-/*GetDebtInfo swagger:route GET /debt transaction getDebtInfo
+/*GetDebtInfo swagger:route GET /debt/{baseUserId}/{toUserId} transaction getDebtInfo
 
 根据基准用户ID，返回跟另外一个用户之间的债务情况
 
