@@ -21,26 +21,30 @@
 表结构如下
 
 user表
-|字段名称|类型| 说明|
-|--|--|--|
-|id| BIGINT | id, pk, auto_inc|
-|username| char(20)| 用户名|
+
+
+| 字段名称 | 类型 | 说明 |
+|---|---|---|
+| id | BIGINT | id, pk, auto_inc|
+|username| char(20)| 用户名 |
 |email| char(30) |邮箱|
-|balance| bigint| 余额|
+|balance| bigint| 余额 |
 |total_borrow|bigint|当前借入未还的金额|
 |total_lend| bigint|当前借出未还的金额|
 
 
 transaction 表
-|字段名称|类型| 说明|
-|--|--|--|
+
+
+| 字段名称 | 类型 | 说明 |
+|---|---|---|
 |id | bigint(20)| pk, auto_inc |
 |from_user_id |bigint | 金额转出用户id|
 |to_user_id |bigint| 金额转入用户id|
 |amount| bigint| 交易金额|
 |created_date| datetime | 交易时间|
 |status| char | 交易状态|
-|is_repay|` tinyint(1)|是否为还款交易|
+|is_repay| tinyint(1)|是否为还款交易|
 
 ## 开发框架
 1. 使用swagger的格式定义接口，使用[go-swagger](https://github.com/go-swagger/go-swagger)生成api server的代码框架
