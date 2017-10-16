@@ -61,6 +61,10 @@ func AddTransaction(fromUserId int64, toUserId int64, amount int64, trans_type s
 	if toUser.Id == 0 {
 		return trans, fmt.Errorf("user not found, id: %d", toUserId)
 	}
+
+	if toUser.Id == fromUserId {
+		return trans, fmt.Errorf("cannot add transaction between same user: %d", toUser.Id)
+	}
 	// 先判余额是否大于转出的金额，后续事务中还会判断
 	if *(fromUser.Balance) < amount {
 		return trans, fmt.Errorf("user %d has balance of %d, less than %d", fromUserId,
