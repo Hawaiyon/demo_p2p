@@ -1,11 +1,11 @@
 package dbmodels
 
 import (
-	"testing"
-	"time"
+	"demo_p2p_bak/models"
 	"fmt"
 	"math/rand"
-	"demo_p2p_bak/models"
+	"testing"
+	"time"
 )
 
 func TestAddUser(t *testing.T) {
@@ -16,17 +16,17 @@ func TestAddUser(t *testing.T) {
 		name[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 
-	for i:=0; i<3; i++{
+	for i := 0; i < 3; i++ {
 		var balance int64 = 200
 		s := string(name)
 		name := fmt.Sprintf("%s_%d", s, i)
-		u := models.User{Username: &name , Balance: &balance}
+		u := models.User{Username: &name, Balance: &balance}
 		AddUser(&u)
-		if u.Id == 0{
+		if u.Id == 0 {
 			t.Errorf("no id after insert: %s", name)
 		}
 		dbUser, _ := GetUserInfo(u.Id)
-		if *(dbUser.Username) != name{
+		if *(dbUser.Username) != name {
 			t.Errorf("name not matching to db: %s vs %s", name, dbUser.Username)
 		}
 
