@@ -11,16 +11,17 @@ import (
 	middleware "github.com/go-openapi/runtime/middleware"
 	graceful "github.com/tylerb/graceful"
 
+	"demo_p2p_bak/models"
+	"demo_p2p_bak/models/dbmodels"
 	"demo_p2p_bak/restapi/operations"
 	"demo_p2p_bak/restapi/operations/transaction"
 	"demo_p2p_bak/restapi/operations/user"
-	"demo_p2p_bak/models/dbmodels"
-	"demo_p2p_bak/models"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"strings"
-	"github.com/go-openapi/strfmt"
 )
+
 // This file is safe to edit. Once it exists it will not be overwritten
 
 //go:generate swagger generate server --target .. --name P2P --spec ../swagger.yml
@@ -46,19 +47,22 @@ func configureAPI(api *operations.P2PAPI) http.Handler {
 	// 创建用户
 	api.UserCreateUserHandler = user.CreateUserHandlerFunc(func(params user.CreateUserParams) middleware.Responder {
 		if err := dbmodels.AddUser(params.Body); err != nil {
-			return user.NewCreateUserDefault(500).WithPayload(&models.APIError{Code: 500, Message: swag.String(err.Error())})
+			return user.NewCreateUserDefault(500).WithPayload(
+				&models.APIError{Code: 500, Message: swag.String(err.Error())})
 		}
 		return user.NewCreateUserCreated().WithPayload(params.Body)
 	})
 
 	// 查询用户
 	api.UserGetUserByIDHandler = user.GetUserByIDHandlerFunc(func(params user.GetUserByIDParams) middleware.Responder {
-			foundUser, err := dbmodels.GetUserInfo(params.UserID)
-		if err != nil{
-			if strings.Contains(err.Error(), "found"){
-				return user.NewGetUserByIDDefault(404)
+		foundUser, err := dbmodels.GetUserInfo(params.UserID)
+		if err != nil {
+			if strings.Contains(err.Error(), "found") {
+				return user.NewGetUserByIDDefault(404).WithPayload(
+					&models.APIError{Code: 404, Message: swag.String(err.Error())})
 			} else {
-				return user.NewGetUserByIDDefault(500)
+				return user.NewGetUserByIDDefault(500).WithPayload(
+					&models.APIError{Code: 500, Message: swag.String(err.Error())})
 			}
 
 		}
@@ -69,33 +73,34 @@ func configureAPI(api *operations.P2PAPI) http.Handler {
 	api.TransactionAddLoanHandler = transaction.AddLoanHandlerFunc(func(params transaction.AddLoanParams) middleware.Responder {
 		trans, err := dbmodels.AddTransaction(
 			*(params.Body.LenderID), *(params.Body.BorrowerID), *(params.Body.Amount), "loan")
-		if err != nil{
-			return transaction.NewAddLoanDefault(500)
+		if err != nil {
+			return transaction.NewAddLoanDefault(500).WithPayload(
+				&models.APIError{Code: 500, Message: swag.String(err.Error())})
 		}
 		ret := models.Loan{ID: trans.ID, CreatedDate: strfmt.DateTime(trans.CreatedDate),
-		BorrowerID: &(trans.ToUserId), LenderID:&(trans.FromUserId), Status:trans.Status, Amount:&(trans.Amount)}
+			BorrowerID: &(trans.ToUserId), LenderID: &(trans.FromUserId), Status: trans.Status, Amount: &(trans.Amount)}
 		return transaction.NewAddLoanCreated().WithPayload(&ret)
-
 
 	})
 	api.TransactionAddRepayHandler = transaction.AddRepayHandlerFunc(func(params transaction.AddRepayParams) middleware.Responder {
 		trans, err := dbmodels.AddTransaction(*params.Body.BorrowerID, *params.Body.LenderID, *params.Body.RepayAmount, "repay")
-		if err != nil{
-			return transaction.NewAddRepayDefault(500)
+		if err != nil {
+			return transaction.NewAddRepayDefault(500).WithPayload(
+				&models.APIError{Code: 500, Message: swag.String(err.Error())})
 		}
 		ret := models.Repayment{ID: trans.ID, CreatedDate: strfmt.DateTime(trans.CreatedDate),
-			BorrowerID: &(trans.ToUserId), LenderID: &(trans.FromUserId), Status:trans.Status, RepayAmount:&(trans.Amount)}
+			BorrowerID: &(trans.ToUserId), LenderID: &(trans.FromUserId), Status: trans.Status, RepayAmount: &(trans.Amount)}
 		return transaction.NewAddRepayCreated().WithPayload(&ret)
 
 	})
 
-
 	api.TransactionGetDebtInfoHandler = transaction.GetDebtInfoHandlerFunc(func(params transaction.GetDebtInfoParams) middleware.Responder {
 		lend, borrow, err := dbmodels.GetUserDebt(params.BaseUserID, params.ToUserID)
-		if err != nil{
-			return transaction.NewGetDebtInfoDefault(500)
+		if err != nil {
+			return transaction.NewGetDebtInfoDefault(500).WithPayload(
+				&models.APIError{Code: 500, Message: swag.String(err.Error())})
 		}
-		debt := models.Debt{Borrow:borrow, Lend:lend, BaseUserID: &(params.BaseUserID), ToUserID: &(params.ToUserID)}
+		debt := models.Debt{Borrow: borrow, Lend: lend, BaseUserID: &(params.BaseUserID), ToUserID: &(params.ToUserID)}
 		return transaction.NewGetDebtInfoOK().WithPayload(&debt)
 	})
 
@@ -105,7 +110,6 @@ func configureAPI(api *operations.P2PAPI) http.Handler {
 	api.TransactionGetRepayByIDHandler = transaction.GetRepayByIDHandlerFunc(func(params transaction.GetRepayByIDParams) middleware.Responder {
 		return middleware.NotImplemented("operation transaction.GetRepayByID has not yet been implemented")
 	})
-
 
 	api.ServerShutdown = func() {}
 

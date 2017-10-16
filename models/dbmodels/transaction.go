@@ -5,9 +5,9 @@ package dbmodels
 import (
 	"demo_p2p_bak/models"
 	"fmt"
-	"time"
 	"github.com/go-xorm/xorm"
 	"log"
+	"time"
 )
 
 // User user
@@ -35,14 +35,14 @@ type Transaction struct {
 	IsRepay bool
 }
 
-func getTransaction(transId int64){
+func getTransaction(transId int64) {
 
 }
 
-func GetUserDebt(lenderId int64, borrowerId int64) (lend int64, borrow int64,  err error){
+func GetUserDebt(lenderId int64, borrowerId int64) (lend int64, borrow int64, err error) {
 	lender, _ := GetUserInfo(lenderId)
 	borrower, _ := GetUserInfo(borrowerId)
-	if lender ==nil || borrower==nil{
+	if lender.Id == 0 || borrower.Id == 0 {
 		err = fmt.Errorf("user not found, %d %d", lenderId, borrowerId)
 		return
 	}
@@ -51,15 +51,14 @@ func GetUserDebt(lenderId int64, borrowerId int64) (lend int64, borrow int64,  e
 	return
 }
 
-
 func AddTransaction(fromUserId int64, toUserId int64, amount int64, trans_type string) (trans Transaction, err error) {
 
 	fromUser, _ := GetUserInfo(fromUserId)
 	toUser, _ := GetUserInfo(toUserId)
-	if  fromUser == nil {
+	if fromUser.Id == 0 {
 		return trans, fmt.Errorf("user not found, id: %d", fromUserId)
 	}
-	if toUser == nil{
+	if toUser.Id == 0 {
 		return trans, fmt.Errorf("user not found, id: %d", toUserId)
 	}
 	// 先判余额是否大于转出的金额，后续事务中还会判断
@@ -85,9 +84,9 @@ func AddTransaction(fromUserId int64, toUserId int64, amount int64, trans_type s
 			return trans, fmt.Errorf("update user balance failed: %d", fromUserId)
 		}
 	}
-	if trans_type == "repay"{
+	if trans_type == "repay" {
 		debt := getDebtForUpdate(session, toUserId, fromUserId)
-		if amount > debt{
+		if amount > debt {
 			session.Rollback()
 			return trans, fmt.Errorf("%d owes %d to %d, less than provided repay number %d ", toUserId,
 				debt, fromUserId, amount)
@@ -114,7 +113,7 @@ func AddTransaction(fromUserId int64, toUserId int64, amount int64, trans_type s
 
 	// 记录交易信息
 	isRepay := false
-	if trans_type == "repay"{
+	if trans_type == "repay" {
 		isRepay = true
 	}
 	trans = Transaction{FromUserId: fromUserId, ToUserId: toUserId, Amount: amount,
@@ -131,21 +130,21 @@ func AddTransaction(fromUserId int64, toUserId int64, amount int64, trans_type s
 
 }
 
-func getDebt(session *xorm.Engine, lenderId int64, borrowerId int64) int64{
+func getDebt(session *xorm.Engine, lenderId int64, borrowerId int64) int64 {
 	trans := new(Transaction)
-	total_lend, _ := session.Where("from_user_id = ?", lenderId).And("to_user_id=?",  borrowerId).
+	total_lend, _ := session.Where("from_user_id = ?", lenderId).And("to_user_id=?", borrowerId).
 		And("is_repay=?", 0).SumInt(trans, "amount")
-	total_repay, _ := session.Where("from_user_id = ?", borrowerId).And("to_user_id=?",  lenderId).
+	total_repay, _ := session.Where("from_user_id = ?", borrowerId).And("to_user_id=?", lenderId).
 		And("is_repay=?", 1).SumInt(trans, "amount")
 
 	return total_lend - total_repay
 }
 
-func getDebtForUpdate(session *xorm.Session, lenderId int64, borrowerId int64) int64{
+func getDebtForUpdate(session *xorm.Session, lenderId int64, borrowerId int64) int64 {
 	trans := new(Transaction)
-	total_lend, _ := session.Where("from_user_id = ?", lenderId).And("to_user_id=?",  borrowerId).
+	total_lend, _ := session.Where("from_user_id = ?", lenderId).And("to_user_id=?", borrowerId).
 		And("is_repay=?", 0).ForUpdate().SumInt(trans, "amount")
-	total_repay, _ := session.Where("from_user_id = ?", borrowerId).And("to_user_id=?",  lenderId).
+	total_repay, _ := session.Where("from_user_id = ?", borrowerId).And("to_user_id=?", lenderId).
 		And("is_repay=?", 1).ForUpdate().SumInt(trans, "amount")
 
 	return total_lend - total_repay

@@ -3,26 +3,24 @@
 package dbmodels
 
 import (
-	"fmt"
 	"demo_p2p_bak/models"
 	"encoding/json"
+	"fmt"
 )
 
 // User user
 // swagger:model User
 
-
-
-func AddUser(user* models.User) (err error){
+func AddUser(user *models.User) (err error) {
 	affected, err := engine.Insert(user)
-	if affected < 1{
+	if affected < 1 {
 		data, _ := json.Marshal(user)
 		return fmt.Errorf("fail to add user to db, user: %s, ", data)
 	}
 	return err
 }
 
-func GetUserInfo(userId int64) (oneUser* models.User, err error){
+func GetUserInfo(userId int64) (oneUser *models.User, err error) {
 	oneUser = new(models.User)
 	has, err := engine.Where("id=?", userId).Get(oneUser)
 	if err != nil {

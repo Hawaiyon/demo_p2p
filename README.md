@@ -2,7 +2,9 @@
 接口已经用swagger定义，可以查看[在线文档](http://demo.hawaiyon.ml/swagger-ui/)
 
 # 演示地址
-[http://demo.hawaiyon.ml/p2p/v1](http://demo.hawaiyon.ml/p2p/v1
+可以直接在[在线文档](http://demo.hawaiyon.ml/swagger-ui/)点api右上角的“Try it out”，编辑内容后发送请求，查看响应。
+
+后端API地址： [http://demo.hawaiyon.ml/v1](http://demo.hawaiyon.ml/v1
 )
 
 # 设计思路
