@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"demo_p2p_bak/models"
 	"encoding/json"
-	"log"
 )
 
 // User user

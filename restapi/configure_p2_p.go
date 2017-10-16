@@ -20,7 +20,6 @@ import (
 	"github.com/go-openapi/swag"
 	"strings"
 	"github.com/go-openapi/strfmt"
-	"golang.org/x/net/html/atom"
 )
 // This file is safe to edit. Once it exists it will not be overwritten
 
@@ -74,7 +73,7 @@ func configureAPI(api *operations.P2PAPI) http.Handler {
 			return transaction.NewAddLoanDefault(500)
 		}
 		ret := models.Loan{ID: trans.ID, CreatedDate: strfmt.DateTime(trans.CreatedDate),
-		BorrowerID: &(trans.ToUserId), LenderID:&(trans.FromUserId), Status:trans.Status, Amount:trans.Amount}
+		BorrowerID: &(trans.ToUserId), LenderID:&(trans.FromUserId), Status:trans.Status, Amount:&(trans.Amount)}
 		return transaction.NewAddLoanCreated().WithPayload(&ret)
 
 
@@ -85,7 +84,7 @@ func configureAPI(api *operations.P2PAPI) http.Handler {
 			return transaction.NewAddRepayDefault(500)
 		}
 		ret := models.Repayment{ID: trans.ID, CreatedDate: strfmt.DateTime(trans.CreatedDate),
-			BorrowerID: &(trans.ToUserId), LenderID: &(trans.FromUserId), Status:trans.Status, RepayAmount:trans.Amount}
+			BorrowerID: &(trans.ToUserId), LenderID: &(trans.FromUserId), Status:trans.Status, RepayAmount:&(trans.Amount)}
 		return transaction.NewAddRepayCreated().WithPayload(&ret)
 
 	})
